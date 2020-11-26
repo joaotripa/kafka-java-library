@@ -6,6 +6,7 @@
 package pt.rics.uninova.kafka.library;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import pt.rics.uninova.kafka.library.model.DataRecord;
@@ -28,6 +29,13 @@ public class ConsumerExample {
         
         Consumer consumer = new Consumer(args[0]);
         String topic = args[1];
+        /* If more than one topic, use an ArrayList
+        ArrayList topics = new ArrayList<String>();
+        topics.add("topic1")
+        topics.add("topic2")
+        topics.add("topic3")
+        */
+        
         consumer.subscribe(topic);
         
         Long total_count = 0L;

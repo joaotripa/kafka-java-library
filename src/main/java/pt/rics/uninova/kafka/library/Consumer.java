@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -41,7 +42,10 @@ public class Consumer {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer");
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaJsonDeserializer");
         props.put(KafkaJsonDeserializerConfig.JSON_VALUE_TYPE, DataRecord.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-x");
+        //Change consumer group ID if multiple consumers subscribe the same topic
+        //or only one will receive the messages
+        //the others will only receive if the first goes offline
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "consumer-x"); 
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         consumer = new KafkaConsumer<String, DataRecord>(props);
@@ -50,6 +54,15 @@ public class Consumer {
     public void subscribe(String topic){
         consumer.subscribe(Arrays.asList(topic));
     }
+    
+    public void subscribe(ArrayList<String> topic){
+        consumer.subscribe(topic);
+    }
+    
+    public void unsubscribe(){
+        consumer.unsubscribe();
+    }
+    
     
     public ConsumerRecords<String, DataRecord> consume(){
         return consumer.poll(Duration.ofMillis(100));           
@@ -65,7 +78,7 @@ public class Consumer {
         }
         final Properties cfg = new Properties();
         try (InputStream inputStream = new FileInputStream(configFile)) {
-          cfg.load(inputStream);
+            cfg.load(inputStream);
         }
         return cfg;
     }
